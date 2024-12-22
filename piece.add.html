@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リバーシ盤</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 2px;
+            background-color: #006400;
+            border: 4px solid #003200;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: #228B22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .piece {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .black {
+            background-color: black;
+        }
+
+        .white {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="board">
+        <!-- 64セルを生成 -->
+        <script>
+            const board = document.querySelector('.board');
+            let currentPlayer = 'black'; // 最初のプレイヤーは黒
+
+            // セルを生成
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                board.appendChild(cell);
+
+                // セルにクリックイベントを追加
+                cell.addEventListener('click', () => placePiece(cell, i));
+            }
+
+            // 駒を配置する関数
+            function placePiece(cell, index) {
+                // すでに駒が置かれていたら何もしない
+                if (cell.children.length > 0) return;
+
+                // 駒を作成
+                const piece = document.createElement('div');
+                piece.classList.add('piece', currentPlayer);
+
+                // セルに駒を追加
+                cell.appendChild(piece);
+
+                // プレイヤーを切り替え
+                currentPlayer = (currentPlayer === 'black') ? 'white' : 'black';
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リバーシ盤</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            gap: 2px;
+            background-color: #006400;
+            border: 4px solid #003200;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: #228B22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .piece {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .black {
+            background-color: black;
+        }
+
+        .white {
+            background-color: white;
+        }
+
+        .score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="board">
+        <!-- 64セルを生成 -->
+    </div>
+    <div class="score">
+        <span id="blackCount">黒: 0</span> | <span id="whiteCount">白: 0</span>
+    </div>
+
+    <script>
+        const board = document.querySelector('.board');
+        let currentPlayer = 'black'; // 最初のプレイヤーは黒
+        const cells = [];
+        const blackCountEl = document.getElementById('blackCount');
+        const whiteCountEl = document.getElementById('whiteCount');
+
+        // セルを生成
+        for (let i = 0; i < 64; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            board.appendChild(cell);
+            cells.push(cell);
+
+            // セルにクリックイベントを追加
+            cell.addEventListener('click', () => placePiece(cell, i));
+        }
+
+        // 駒を配置する関数
+        function placePiece(cell, index) {
+            // すでに駒が置かれていたら何もしない
+            if (cell.children.length > 0) return;
+
+            // クリックした位置に駒を配置
+            const piece = document.createElement('div');
+            piece.classList.add('piece', currentPlayer);
+            cell.appendChild(piece);
+
+            // 駒を反転させる
+            flipPieces(index);
+
+            // プレイヤーを切り替え
+            currentPlayer = (currentPlayer === 'black') ? 'white' : 'black';
+
+            // 集計を更新
+            updateScore();
+        }
+
+        // 駒を反転させる関数
+        function flipPieces(index) {
+            const directions = [
+                -1,  // 左
+                1,   // 右
+                -8,  // 上
+                8,   // 下
+                -9,  // 左上
+                9,   // 右上
+                -7,  // 左下
+                7    // 右下
+            ];
+
+            directions.forEach(direction => {
+                let i = index + direction;
+                let flipped = [];
+                
+                // 進んでいける限り進む
+                while (i >= 0 && i < 64 && cells[i].children.length > 0 && cells[i].children[0].classList.contains(getOpponent(currentPlayer))) {
+                    flipped.push(i);
+                    i += direction;
+                }
+
+                // 相手の駒を挟んだ場合
+                if (i >= 0 && i < 64 && cells[i].children.length > 0 && cells[i].children[0].classList.contains(currentPlayer)) {
+                    // 挟んだ駒を反転
+                    flipped.forEach(idx => {
+                        cells[idx].children[0].classList.replace(getOpponent(currentPlayer), currentPlayer);
+                    });
+                }
+            });
+        }
+
+        // 相手の駒を取得
+        function getOpponent(player) {
+            return player === 'black' ? 'white' : 'black';
+        }
+
+        // 集計を更新する関数
+        function updateScore() {
+            let blackCount = 0;
+            let whiteCount = 0;
+
+            // 盤上の駒を数える
+            cells.forEach(cell => {
+                if (cell.children.length > 0) {
+                    const piece = cell.children[0];
+                    if (piece.classList.contains('black')) {
+                        blackCount++;
+                    } else if (piece.classList.contains('white')) {
+                        whiteCount++;
+                    }
+                }
+            });
+
+            // 集計を表示
+            blackCountEl.textContent = `黒: ${blackCount}`;
+            whiteCountEl.textContent = `白: ${whiteCount}`;
+        }
+    </script>
+</body>
+</html>
